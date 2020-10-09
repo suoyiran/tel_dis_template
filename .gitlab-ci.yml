@@ -1,0 +1,67 @@
+stages:
+  - test
+  - build
+  - package
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  PROJECT: c-tb8w5:p-4fhxm
+  NAMESPACE: app
+  CONTAINER: mobile
+  IMAGE_NAME: core.harbor.sdcom.gov.cn/refined-oil/mobile-ui
+
+cache:
+  key: refined-oil-mobile-cache
+  paths:
+    - node_modules/
+
+build:
+  stage: build
+  image: node:10-alpine
+  artifacts:
+    paths:
+      - dist
+  script:
+    - npm config set registry=https://registry.npm.taobao.org
+    - npm i
+    - npm run build:ju
+    - npm run build:mobile
+    - cp dist/index.html dist/app.html
+    - sed -i '1i\<script>window.historyMode = true;</script>' dist/index.html
+    - echo "<script src='/m.js?v=$CI_COMMIT_SHA'></script>" >> dist/index.html
+  tags:
+    - shared-runner
+
+package:
+  stage: package
+  image: repo.xmartjoy.com:5000/docker
+  cache:
+    key: "no-cache-$CI_COMMIT_SHA"
+    policy: pull
+  only:
+    - master
+  script:
+    - docker login core.harbor.sdcom.gov.cn -u admin -p douwei800613
+    - docker build -f Dockerfile -t $IMAGE_NAME ./
+    - docker push $IMAGE_NAME
+  tags:
+    - shared-runner
+
+deploy:
+  stage: deploy
+  image: repo.xmartjoy.com:5000/rancher-cli
+  cache:
+    key: "no-cache-$CI_COMMIT_SHA"
+    policy: pull
+  only:
+    - master
+  script:
+    - sed -i s=PROJECT_VAL=$PROJECT= docker/cli2.json
+    - cp docker/cli2.json /root/.rancher/cli2.json
+    - sed -i "s/CI_PIPELINE_ID_VAL/$CI_PIPELINE_ID/g" docker/patch.yml
+    - sed -i s=IMAGE_NAME_VAL=$IMAGE_NAME= docker/patch.yml
+    - sed -i s=CONTAINER_VAL=$CONTAINER= docker/patch.yml
+    - rancher kubectl --namespace=$NAMESPACE patch deployment $CONTAINER --patch "$(cat docker/patch.yml)"
+  tags:
+    - shared-runner

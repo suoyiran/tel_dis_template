@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0, maximum-scale=1.0,user-scalable=no"
+    />
+    <script language="JavaScript" src="./js/jquery.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <title>招商引资下载</title>
+  </head>
+  <script type="text/javascript">
+    window.onload = function() {
+      $('.scanios').click(function() {
+        axios
+          .get('https://api.li.xmartjoy.com/api/app/versions/ios')
+          .then((res) => {
+            console.log(res)
+            if (res.data.code === 200) {
+              window.open(res.data.data.link, '_self')
+            } else {
+              alert('下载未知错误')
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+            alert('下载未知错误')
+          })
+      })
+      $('.scanan').click(function() {
+        axios
+          .get('https://api.li.xmartjoy.com/api/app/versions/android')
+          .then((res) => {
+            console.log(res)
+            if (res.data.code === 200) {
+              window.open(res.data.data.link, '_self')
+            } else {
+              alert('下载未知错误')
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+            alert('下载未知错误')
+          })
+      })
+    }
+  </script>
+  <body style="margin:0">
+    <div id="scan">
+      <div class="scanimg">
+        <a class="scanios"><img src="../img/huixiang_01_02.jpg" alt=""/></a>
+        <a class="scanan"><img src="../img/huixiang_01_03.jpg" alt=""/></a>
+      </div>
+    </div>
+    <style lang="scss" scoped>
+      #scan {
+        background: url('../img/huixiang_01_01.jpg');
+        background-size: 100% 100%;
+        height: 100%;
+        position: fixed;
+        width: 100%;
+      }
+      .scanimg {
+        width: 100%;
+        height: 50px;
+        position: fixed;
+        bottom: 75px;
+        display: flex;
+        justify-content: space-around;
+      }
+      .scanimg a {
+        display: block;
+        width: 150px;
+        height: 50px;
+        border-radius: 29px;
+      }
+      .scanimg a img {
+        width: 100%;
+        height: 100%;
+        border-radius: 27px;
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "B5BVZPTW69.com.fusion.ios.huixiangyouli",
+                "paths": [
+                    "/app/*"
+                ]
+            }
+        ]
+    },
+    "webcredentials": {
+         "apps": [
+            "B5BVZPTW69.com.fusion.ios.huixiangyouli"
+         ]
+    }
+}
